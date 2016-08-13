@@ -1,0 +1,17 @@
+.label {
+    font-size: 14px;
+	color: #000000;
+    vertical-align: center;
+}
+
+.small-label {
+    width: 90px;
+}
+
+.small-number {
+    width: 30px;
+}
+
+.big-button {
+    font-size: 20px;
+}

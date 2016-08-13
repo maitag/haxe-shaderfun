@@ -12,7 +12,7 @@
     <!--<haxelib name="actuate" />-->
 
     <haxelib name="haxeui-core" />
-	<source path="../haxeui-openfl" />
+	<haxelib name="haxeui-openfl" />
     <!--<haxelib name="haxeui-openfl" />-->
 
 	<source path="../PeoteView/Source" />
@@ -26,4 +26,5 @@
     <assets path="assets/shader" rename="shader" />
     <assets path="assets/css" rename="css" />
     <assets path="assets/ui" rename="ui" />
+    <assets path="assets/img" rename="img" />
 </project>
