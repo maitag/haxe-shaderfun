@@ -1,2 +1,2 @@
 # haxe-shaderfun
-lyapunov fat fractals haxe prodecure
+lyapunov fat fractal explore ...

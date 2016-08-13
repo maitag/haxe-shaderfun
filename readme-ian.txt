@@ -1,0 +1,5 @@
+- "pos" or "value" slider-settings for Float?
+- background-opacity
+- easy theme changing for some components only (that blue color in sliders)
+- Math or custom classes via hscript ;)
+- "dce full" build

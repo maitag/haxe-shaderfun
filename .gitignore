@@ -1,0 +1,6 @@
+bin/html5/
+bin/windows/
+bin/android/
+bin/linux/
+bin/flash/
+.build

@@ -1,0 +1,40 @@
+#main {
+    padding: 10px;
+    padding-top: 1px;
+}
+
+#items {
+	padding:8px;
+	padding-top:-20px;
+	horizontal-align:right;
+	background-color:#000000;
+}
+
+.close-button {
+	horizontal-align:right;
+    font-size: 30px;
+    width: 25px;
+	height: 18px;
+	color: #ffff88;
+	background-color:#000000;
+}
+
+.big-button {
+    font-size: 20px;
+    width: 250px;
+	height: 24px;
+}
+
+.small-label {
+	horizontal-align:right;
+    font-size: 14px;
+    width: 77px;
+	color: #ffff88;
+}
+
+.small-number {
+	horizontal-align:right;
+    font-size: 14px;
+    width: 20px;
+	color: #ffff88;
+}
