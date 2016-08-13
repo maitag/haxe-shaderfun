@@ -1,2 +1,3 @@
 # haxe-shaderfun
-lyapunov fat fractal explore ...
+explore lyapunov fat fractals
+![lyapunow fractal](haxeui2-fractalgenerator.jpg?raw=true)
