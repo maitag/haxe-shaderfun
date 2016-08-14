@@ -44,7 +44,7 @@
         <hbox>
             <label text="Iteration:" styleNames="small-label" />
             <hslider id="iteration1" min="1" max="99" value="5" />
-            <label bindTo="iteration1" bindTransform="${MathUtils.round(value, 2)}" styleNames="small-number" />
+            <label bindTo="iteration1" bindTransform="${MathUtils.round(value, 1)}" styleNames="small-number" />
         </hbox>    
         
         <hbox>
