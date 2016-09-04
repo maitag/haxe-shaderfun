@@ -19,11 +19,22 @@
     
         function generateRandom() {
             iteration0.pos = Math.random() * iteration0.max;
-            iteration1.pos = Math.random() * iteration1.max;
-            param0.pos = Math.random() * param0.max + 1;
+            iteration1.pos = Math.random() * (iteration1.max-1) + 1;
+            param0.pos = Math.random() * (param0.max-1) + 1;
             param1.pos = Math.random() * param1.max;
             start.pos = Math.random() * start.max;
             balance.pos = Math.random() * balance.max;
+			/*if (randomcolor.value == true) {
+				r1.pos = Math.random();
+				r2.pos = Math.random();
+				r3.pos = Math.random();
+				g1.pos = Math.random();
+				g2.pos = Math.random();
+				g3.pos = Math.random();
+				b1.pos = Math.random();
+				b2.pos = Math.random();
+				b3.pos = Math.random();
+			}*/
         }
     </script>
     
@@ -39,13 +50,13 @@
 		
         <hbox>
             <label text="Pre Iteration:" styleNames="left" />
-            <hslider id="iteration0" min="0" max="10" value="2" styleNames="middle" />
+            <hslider id="iteration0" min="0" max="20" value="2" styleNames="middle" />
             <label bindTo="iteration0" bindTransform="${MathUtils.round(value, 2)}" styleNames="right" />
         </hbox>    
         
         <hbox>
             <label text="Iteration:" styleNames="left" />
-            <hslider id="iteration1" min="1" max="99" value="5" styleNames="middle" />
+            <hslider id="iteration1" min="1" max="200" value="5" styleNames="middle" />
             <label bindTo="iteration1" bindTransform="${MathUtils.round(value, 1)}" styleNames="right" />
         </hbox>    
         
@@ -75,8 +86,10 @@
         
         <hbox style="padding-top:8px; padding-bottom:12px; ">
 			<button id="random" onclick="generateRandom()" styleNames="random-button" text="Random" />
-        </hbox>    
-        
+        </hbox>
+		
+		<!--<checkbox id="randomcolor" value="true" text="randomize colors" />-->
+		
         <hbox>
             <vbox width="33%">
                 <label text="Pos Color" styleNames="col-label" />

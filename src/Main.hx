@@ -11,6 +11,7 @@ import openfl.display.StageDisplayState;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
+import openfl.events.TouchEvent;
 import openfl.geom.Rectangle;
 import openfl.ui.Keyboard;
 
@@ -18,16 +19,20 @@ class Main {
 	static var view:OpenGLView;
     static var width: Int;
     static var height: Int;
-    static var mouse_x: Int = 0;
-    static var mouse_y: Int = 0;
-    static var zoom: Int = 1;
-    static var xOffset: Int = 0;
-    static var yOffset: Int = 0;
+    static var mouse_x: Float = 0;
+    static var mouse_y: Float = 0;
+    static var dragstart_x: Float = 0;
+    static var dragstart_y: Float = 0;
+    static var dragmode: Bool = false;
+    static var zoom: Float = 1.0;
+    static var zoomstep: Float = 1.2;
 	
 	static var startTime:Float;
 	static var peoteView:PeoteView;
 	
 	// shader uniform vars
+	public static var position:Array<Dynamic> = [0.0, 0.0];
+	public static var scale:Array<Dynamic> = [400.0, 400.0];
 	public static var iteration:Array<Dynamic> = [3, 5];
 	public static var param:Array<Dynamic> = [1.9, 2.3];
 	public static var balance:Array<Dynamic> = [0.5];
@@ -50,7 +55,10 @@ class Main {
 		Lib.current.stage.addEventListener( MouseEvent.MOUSE_DOWN, function(e:MouseEvent) { onMouseDown( e.stageX, e.stageY, 0 );  } );
 		Lib.current.stage.addEventListener( MouseEvent.MOUSE_UP,   function(e:MouseEvent) { onMouseUp( e.stageX, e.stageY, 0 );  } );
 		Lib.current.stage.addEventListener( MouseEvent.MOUSE_WHEEL,function(e:MouseEvent) { onMouseWheel( e.delta, e.delta );  } );
-		Lib.current.stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown );
+		/*Lib.current.stage.addEventListener( TouchEvent.TOUCH_BEGIN, onTouchBegin);
+		Lib.current.stage.addEventListener( TouchEvent.TOUCH_END,   onTouchEnd  );
+		Lib.current.stage.addEventListener( TouchEvent.TOUCH_MOVE,  onTouchMove );*/
+		Lib.current.stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown   );
     }
 
 	
@@ -70,6 +78,8 @@ class Main {
 				program:0,
 				fshader: "shader/lyapunov.frag",
 				vars: [
+					"uPosition" => position,
+					"uScale" => scale,
 					"uIteration" => iteration,
 					"uParam" => param,
 					"uBalance"=> balance,
@@ -97,8 +107,8 @@ class Main {
 				program:0,
 				x: 0,
 				y: 0,
-				w: 4000,
-				h: 4000,
+				w: 2000,
+				h: 2000,
 			});
 			
 
@@ -113,7 +123,7 @@ class Main {
 	// ----------- Render Loop ------------------------------------
 	static function renderView (rect:Rectangle):Void
 	{
-			peoteView.render(Timer.stamp() - startTime, Std.int (rect.width), Std.int (rect.height), mouse_x, mouse_y, zoom, xOffset, yOffset);
+		peoteView.render(Timer.stamp() - startTime, Std.int (rect.width), Std.int (rect.height), Std.int(mouse_x), Std.int(mouse_y), 1);
 	}
 
 
@@ -128,37 +138,82 @@ class Main {
         var ui = Screen.instance.rootComponents[0];
         ui.left = w - ui.width;
 	}
-	static function onMouseMove (x:Float, y:Float):Void
-	{
-		//trace("onMouseMove: " + x + "," + y );
-		mouse_x = Std.int(x);
-		mouse_y = Std.int(y);		
-		setOffsets();
-	}
-	static function onTouchMove (x:Float, y:Float, id:Int):Void
-	{
-		//trace("onTouchMove: " + x + "," + y );
-		mouse_x = Std.int(x);
-		mouse_y = Std.int(y);
-		setOffsets();
-	}
+
+	
+	// Mouse Events ---------------------------------------------
+
 	static function onMouseDown (x:Float, y:Float, button:Int):Void
 	{	
 		//trace("onMouseDown: x=" + x + " y="+ y);
-		//if ( button == 0) zoom++;
-		//else if (button == 1 && zoom>1) zoom--;
+		if ( button == 0)
+		{
+			dragstart_x = position[0] - x;
+			dragstart_y = position[1] - y;
+			dragmode = true;
+		}
+		//else if (button == 1) {}
 	}
+	
 	static function onMouseUp (x:Float, y:Float, button:Int):Void
 	{	
 		//trace("onmouseup: "+button+" x=" + x + " y="+ y);
+		dragmode = false;
 	}
+	
+	static function onMouseMove (x:Float, y:Float):Void
+	{
+		//trace("onMouseMove: " + x + "," + y );
+		mouse_x = x;
+		mouse_y = y;		
+		if (dragmode)
+		{
+			position[0] = (dragstart_x + mouse_x);
+			position[1] = (dragstart_y + mouse_y);
+		}
+	}
+	
 	static function onMouseWheel (deltaX:Float, deltaY:Float):Void
 	{	
 		//trace("onmousewheel: " + deltaX + ',' + deltaY );
-		if ( deltaY>0 ) zoom++;
-		else if (zoom > 1) zoom--;
-		setOffsets();
+		if ( deltaY > 0 )
+		{
+			if (zoom < 10000)
+			{
+				position[0] -= zoomstep * (mouse_x - position[0]) - (mouse_x - position[0]);
+				position[1] -= zoomstep * (mouse_y - position[1]) - (mouse_y - position[1]);
+				zoom *= zoomstep;
+			}
+		}
+		else if ( zoom > 0.03 )
+		{
+			position[0] -= (mouse_x - position[0]) / zoomstep - (mouse_x - position[0]);
+			position[1] -= (mouse_y - position[1]) / zoomstep - (mouse_y - position[1]);
+			zoom /= zoomstep;
+		}
+		scale[0] = scale[1] =  zoom*400.0;
 	}
+	
+	// Touch Events --------------------------------------------- TODO
+	/*
+	static function onTouchBegin (e:TouchEvent):Void
+	{
+		trace("onTouchBegin: " + e );
+		//e.localX
+		//e.localY
+		//e.touchPointID
+	}
+	static function onTouchEnd (e:TouchEvent):Void
+	{
+		trace("onTouchEnd: " + e );
+	}
+	static function onTouchMove (e:TouchEvent):Void
+	{
+		trace("onTouchMove: " + e );
+	}
+	*/
+	
+	// Keyboard Events -------------------------------------------
+	
 	static function onKeyDown (k:KeyboardEvent):Void
 	{
 		switch (k.keyCode) {
@@ -192,12 +247,7 @@ class Main {
 			default:
 		}
 	}
-	// end Event Handler ------------------------------
+	// end Event Handler
 	// ------------------------------------------------------------
-	
-	static function setOffsets():Void {
-		xOffset = Std.int( - width*(zoom-1)/zoom * mouse_x/width);
-		yOffset = Std.int( - height*(zoom-1)/zoom * mouse_y/height);
-	}
 
 }

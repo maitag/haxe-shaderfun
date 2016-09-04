@@ -10,8 +10,8 @@
    ############################################################################### */
    
 varying vec2 vTexCoord;
-uniform vec2 uMouse, uResolution, uParam;
-uniform vec2 uIteration;
+uniform vec2 uMouse, uResolution, uScale, uPosition;
+uniform vec2 uIteration, uParam;
 uniform float uStart;
 uniform float uBalance;
 uniform vec3 uColpos;
@@ -48,7 +48,7 @@ void main( void ) {
 
 	// Parameter
 	float x = uStart;
-	vec2 p = vTexCoord/400.0;
+	vec2 p = (vTexCoord - uPosition) / uScale;
 	float p1 = uParam.x;
 	float p2 = uParam.y;
 	int iter_pre =  int(floor(uIteration.x));
@@ -61,7 +61,7 @@ void main( void ) {
 	
 	// pre-iteration ##########################
 	
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 21; i++) {
 		if (i < iter_pre)
 		{
 			pre_step(x, p, p1, p2);
@@ -75,7 +75,7 @@ void main( void ) {
 		
 	// main-iteration ########################
 	
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 201; i++) {
 		if (i < iter_main)
 		{
 			main_step(index, iter, x, p, p1, p2, uBalance);
