@@ -7,3 +7,7 @@ explore -> [mouseclick](http://maitag.de/semmi/haxeopenfl/haxeui2-fractalgenerat
   
   
 ![lyapunow fractal](haxeui2-fractalgenerator.jpg?raw=true)
+
+
+did this with [shigo](https://www.youtube.com/watch?v=lOdvuGb_wx8) friend in mind,  
+so there is no "save" button
