@@ -28,26 +28,23 @@ class UI extends Component {
     }
     
     private function updateView(e = null) {
-        // need to parseFloat here as Main.iteration[0] is a Dynamic and Variant (.value) doesnt know to use Float
-        // best change would be to make Main.iteration an Array<Float> but i tried and it broke other things relating
-        // to the fractals, so left it as is
-        Main.iteration[0] = Std.parseFloat(iteration0.value);
-        Main.iteration[1] = Std.parseFloat(iteration1.value);
-        Main.param[0] = Std.parseFloat(param0.value);
-        Main.param[1] = Std.parseFloat(param1.value);
-        Main.start[0] = Std.parseFloat(start.value);
-        Main.balance[0] = Std.parseFloat(balance.value);
+        Main.iteration[0] = iteration0.value;
+        Main.iteration[1] = iteration1.value;
+        Main.param[0] = param0.value;
+        Main.param[1] = param1.value;
+        Main.start[0] = start.value;
+        Main.balance[0] = balance.value;
         
-        Main.colpos[0] = Std.parseFloat(r1.value);
-        Main.colpos[1] = Std.parseFloat(g1.value);
-        Main.colpos[2] = Std.parseFloat(b1.value);
+        Main.colpos[0] = r1.value;
+        Main.colpos[1] = g1.value;
+        Main.colpos[2] = b1.value;
         
-        Main.colmid[0] = Std.parseFloat(r2.value);
-        Main.colmid[1] = Std.parseFloat(g2.value);
-        Main.colmid[2] = Std.parseFloat(b2.value);
+        Main.colmid[0] = r2.value;
+        Main.colmid[1] = g2.value;
+        Main.colmid[2] = b2.value;
         
-        Main.colneg[0] = Std.parseFloat(r3.value);
-        Main.colneg[1] = Std.parseFloat(g3.value);
-        Main.colneg[2] = Std.parseFloat(b3.value);
+        Main.colneg[0] = r3.value;
+        Main.colneg[1] = g3.value;
+        Main.colneg[2] = b3.value;
     }
 }

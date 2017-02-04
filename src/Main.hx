@@ -1,7 +1,7 @@
 package;
 
-import de.peote.view.PeoteView;
-import de.peote.view.displaylist.DisplaylistType;
+import peote.view.PeoteView;
+import peote.view.displaylist.DisplaylistType;
 import haxe.Timer;
 import haxe.ui.Toolkit;
 import haxe.ui.core.Screen;
@@ -17,38 +17,40 @@ import openfl.ui.Keyboard;
 
 class Main {
 	static var view:OpenGLView;
-    static var width: Int;
-    static var height: Int;
-    static var mouse_x: Float = 0;
-    static var mouse_y: Float = 0;
-    static var dragstart_x: Float = 0;
-    static var dragstart_y: Float = 0;
-    static var dragmode: Bool = false;
-    static var zoom: Float = 1.0;
-    static var zoomstep: Float = 1.2;
-	
+	static var width: Int;
+	static var height: Int;
+	static var mouse_x: Float = 0;
+	static var mouse_y: Float = 0;
+	static var dragstart_x: Float = 0;
+	static var dragstart_y: Float = 0;
+	static var dragmode: Bool = false;
+	static var zoom: Float = 1.0;
+	static var zoomstep: Float = 1.2;
+
 	static var startTime:Float;
 	static var peoteView:PeoteView;
-	
+
 	// shader uniform vars
-	public static var position:Array<Dynamic> = [0.0, 0.0];
-	public static var scale:Array<Dynamic> = [400.0, 400.0];
-	public static var iteration:Array<Dynamic> = [3, 5];
-	public static var param:Array<Dynamic> = [1.9, 2.3];
-	public static var balance:Array<Dynamic> = [0.5];
-	public static var start:Array<Dynamic> = [0.5];
-	public static var colpos:Array<Dynamic> = [1.0,0.0,0.0];
-	public static var colmid:Array<Dynamic> = [0.0,0.0,0.0];
-	public static var colneg:Array<Dynamic> = [0.0,0.0,1.0];
-	static var coltype:Array<Dynamic> = [0];
-	
-    public static function main() {
-        initPeoteView();
-		
+	static var position:Array<Float> = [0, 0];
+	static var scale:Array<Float> = [400, 400];
+	static var coltype:Array<Float> = [0];
+
+	public static var iteration:Array<Float> = [3, 5];
+	public static var param:Array<Float> = [1.9, 2.3];
+	public static var balance:Array<Float> = [0.5];
+	public static var start:Array<Float> = [0.5];
+	public static var colpos:Array<Float> = [1,0,0];
+	public static var colmid:Array<Float> = [0,0,0];
+	public static var colneg:Array<Float> = [0,0,1];
+
+
+	public static function main() {
+		initPeoteView();
+
 		Toolkit.init();
 
-        var ui:UI = new UI();
-        Screen.instance.addComponent(ui);
+		var ui:UI = new UI();
+		Screen.instance.addComponent(ui);
 		// stage events -----------------------------------------
 		Lib.current.stage.addEventListener( Event.RESIZE, function(e) { onWindowResize( Lib.current.stage.stageWidth, Lib.current.stage.stageHeight );  } );
 		Lib.current.stage.addEventListener( MouseEvent.MOUSE_MOVE, function(e:MouseEvent) { onMouseMove( e.stageX, e.stageY );  } );
@@ -59,7 +61,7 @@ class Main {
 		Lib.current.stage.addEventListener( TouchEvent.TOUCH_END,   onTouchEnd  );
 		Lib.current.stage.addEventListener( TouchEvent.TOUCH_MOVE,  onTouchMove );*/
 		Lib.current.stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown   );
-    }
+	}
 
 	
 	
@@ -108,7 +110,7 @@ class Main {
 				x: 0,
 				y: 0,
 				w: 2000,
-				h: 2000,
+				h: 2000
 			});
 			
 
@@ -134,9 +136,9 @@ class Main {
 	{
 		width = w;
 		height = h;
-        
-        var ui = Screen.instance.rootComponents[0];
-        ui.left = w - ui.width;
+		
+		var ui = Screen.instance.rootComponents[0];
+		ui.left = w - ui.width;
 	}
 
 	
@@ -240,7 +242,7 @@ class Main {
 				}
 				#else
 				if(Lib.current.stage.displayState != StageDisplayState.FULL_SCREEN_INTERACTIVE)
-				     Lib.current.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+					 Lib.current.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
 				else Lib.current.stage.displayState = StageDisplayState.NORMAL;
 				#end				
 							

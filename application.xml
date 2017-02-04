@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-    <meta title="haxeshaderfun" package="haxe.shaderfun" version="0.6.0" company="Sylvio Sell" />
-    <app main="Main" file="haxe-shaderfun" path="bin" />
+    <meta title="haxeshaderfun" package="haxe.shaderfun" version="0.6.6" company="Sylvio Sell" />
+    <app main="Main" file="haxeshaderfun" path="bin" />
 
     <!--<window background="#FFFFFF" fps="60" />
     <window width="800" height="600" unless="mobile" />-->
@@ -12,16 +12,16 @@
     <!--<haxelib name="actuate" />-->
 
     <haxelib name="haxeui-core" />
-	<haxelib name="haxeui-openfl" />
- 
-	<source path="../PeoteView/Source" />
+    <haxelib name="haxeui-openfl" />
+
+	<haxelib name="peote-view" /><!-- install via: haxelib git peote-view https://github.com/maitag/peote-view  -->
 
 	<!-- shader float precision for html5 and raspberry pi and android -->
 	<haxedef name="peote_vert_medium_precision" if="rpi||android" />
 	<haxedef name="peote_frag_medium_precision" if="rpi||android" />
 	<!--<haxedef name="debugshader" />-->
-	<!--<haxeflag name="-dce" value="full" if="cpp||android||html5" />-->
-
+	<!--<haxeflag name="-dce" value="full" />-->
+	
     <assets path="assets/css" rename="css" />
     <assets path="assets/fonts" rename="fonts" />
     <assets path="assets/img" rename="img" />
