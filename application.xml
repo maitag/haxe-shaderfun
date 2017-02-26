@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-    <meta title="haxeshaderfun" package="haxe.shaderfun" version="0.6.6" company="Sylvio Sell" />
+    <meta title="haxeshaderfun" package="haxe.shaderfun" version="0.6.7" company="Sylvio Sell" />
     <app main="Main" file="haxeshaderfun" path="bin" />
 
     <!--<window background="#FFFFFF" fps="60" />

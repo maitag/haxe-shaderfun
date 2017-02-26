@@ -97,8 +97,6 @@ class Main {
 				displaylist:0,
 				type:DisplaylistType.SIMPLE,
 				maxElements:       1,
-				maxPrograms:       1,
-				bufferSegments:    1,
 				x:0,
 				y:0,
 			});
@@ -125,7 +123,7 @@ class Main {
 	// ----------- Render Loop ------------------------------------
 	static function renderView (rect:Rectangle):Void
 	{
-		peoteView.render(Timer.stamp() - startTime, Std.int (rect.width), Std.int (rect.height), Std.int(mouse_x), Std.int(mouse_y), 1);
+		peoteView.render(Timer.stamp() - startTime, Std.int (rect.width), Std.int (rect.height));
 	}
 
 
