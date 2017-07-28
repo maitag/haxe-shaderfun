@@ -9,3 +9,5 @@ explore -> [mouseclick](http://maitag.de/semmi/haxeopenfl/haxeui2-fractalgenerat
 ![lyapunow fractal](haxeui2-fractalgenerator.jpg?raw=true)
 
 
+##todo
+input text-line for formula

@@ -8,13 +8,19 @@
     
 	<!-- classpath, haxe libs -->
     <source path="src" />
-    <haxelib name="openfl" />
-    <!--<haxelib name="actuate" />-->
+	
+    <haxelib name="actuate" />
+    <haxelib name="hscript" />
+	
+
+	<haxelib name="peote-view" /><!-- install via: haxelib git peote-view https://github.com/maitag/peote-view  -->
+
+	<haxelib name="openfl" />
+
 
     <haxelib name="haxeui-core" />
     <haxelib name="haxeui-openfl" />
 
-	<haxelib name="peote-view" /><!-- install via: haxelib git peote-view https://github.com/maitag/peote-view  -->
 
 	<!-- shader float precision for html5 and raspberry pi and android -->
 	<haxedef name="peote_vert_medium_precision" if="rpi||android" />

@@ -28,23 +28,24 @@ class UI extends Component {
     }
     
     private function updateView(e = null) {
-        Main.iteration[0] = iteration0.value;
-        Main.iteration[1] = iteration1.value;
-        Main.param[0] = param0.value;
-        Main.param[1] = param1.value;
-        Main.start[0] = start.value;
-        Main.balance[0] = balance.value;
+		
+        Main.iteration[0] = iteration0.value.toFloat()/100;
+        Main.iteration[1] = iteration1.value.toFloat()/100;
+        Main.param[0] = param0.value.toFloat()/100;
+        Main.param[1] = param1.value.toFloat()/100;
+        Main.start[0] = start.value.toFloat()/100;
+        Main.balance[0] = balance.value.toFloat()/100;
         
-        Main.colpos[0] = r1.value;
-        Main.colpos[1] = g1.value;
-        Main.colpos[2] = b1.value;
+		Main.colpos[0] = r1.value.toFloat()/100;
+        Main.colpos[1] = g1.value.toFloat()/100;
+        Main.colpos[2] = b1.value.toFloat()/100;
         
-        Main.colmid[0] = r2.value;
-        Main.colmid[1] = g2.value;
-        Main.colmid[2] = b2.value;
+        Main.colmid[0] = r2.value.toFloat()/100;
+        Main.colmid[1] = g2.value.toFloat()/100;
+        Main.colmid[2] = b2.value.toFloat()/100;
         
-        Main.colneg[0] = r3.value;
-        Main.colneg[1] = g3.value;
-        Main.colneg[2] = b3.value;
+        Main.colneg[0] = r3.value.toFloat()/100;
+        Main.colneg[1] = g3.value.toFloat()/100;
+        Main.colneg[2] = b3.value.toFloat()/100;
     }
 }
