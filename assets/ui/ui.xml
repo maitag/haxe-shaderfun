@@ -89,7 +89,7 @@
         </hbox>    
         
         <hbox style="padding-top:8px; padding-bottom:12px; ">
-			<button id="random" onclick="generateRandom()" styleNames="random-button" text="Random" />
+			<button id="random" onclick="generateRandom()" styleNames="random-button" text="Random Parameter" />
         </hbox>
 		
 		<!--<checkbox id="randomcolor" value="true" text="randomize colors" />-->

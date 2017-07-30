@@ -8,6 +8,9 @@ class UI extends Component {
     public function new() {
         super();
         
+        registerEvent(MouseEvent.MOUSE_DOWN, function(e:MouseEvent) { Main.uiIsdragging = true; });
+        registerEvent(MouseEvent.MOUSE_UP  , function(e:MouseEvent) { Main.uiIsdragging = false; });
+
         iteration0.onChange = updateView;
         iteration1.onChange = updateView;
         param0.onChange = updateView;
@@ -23,8 +26,8 @@ class UI extends Component {
         r3.onChange = updateView;
         g3.onChange = updateView;
         b3.onChange = updateView;
-        
-        updateView();
+		
+		updateView();
     }
     
     private function updateView(e = null) {

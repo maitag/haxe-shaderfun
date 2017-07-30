@@ -24,6 +24,7 @@ class Main {
 	static var dragstart_x: Float = 0;
 	static var dragstart_y: Float = 0;
 	static var dragmode: Bool = false;
+	public static var uiIsdragging: Bool = false;
 	static var zoom: Float = 1.0;
 	static var zoomstep: Float = 1.2;
 
@@ -165,7 +166,7 @@ class Main {
 		//trace("onMouseMove: " + x + "," + y );
 		mouse_x = x;
 		mouse_y = y;		
-		if (dragmode)
+		if (dragmode && !uiIsdragging)
 		{
 			position[0] = (dragstart_x + mouse_x);
 			position[1] = (dragstart_y + mouse_y);
