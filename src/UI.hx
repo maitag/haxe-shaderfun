@@ -9,8 +9,8 @@ class UI extends Component {
         super();
         
         registerEvent(MouseEvent.MOUSE_DOWN, function(e:MouseEvent) { Main.uiIsdragging = true; });
-        registerEvent(MouseEvent.MOUSE_UP  , function(e:MouseEvent) { Main.uiIsdragging = false; });
-
+        registerEvent(MouseEvent.MOUSE_UP , function(e:MouseEvent) { Main.uiIsdragging = false; });
+		
         iteration0.onChange = updateView;
         iteration1.onChange = updateView;
         param0.onChange = updateView;

@@ -62,6 +62,13 @@ class Main {
 		Lib.current.stage.addEventListener( TouchEvent.TOUCH_END,   onTouchEnd  );
 		Lib.current.stage.addEventListener( TouchEvent.TOUCH_MOVE,  onTouchMove );*/
 		Lib.current.stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown   );
+		
+		// stop dragging if mouse leaves app-window
+		Lib.current.stage.addEventListener( Event.MOUSE_LEAVE, function(e:MouseEvent) {
+			onMouseUp( e.stageX, e.stageY, 0 );
+			ui.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP));
+		});
+		
 	}
 
 	
@@ -159,6 +166,7 @@ class Main {
 	{	
 		//trace("onmouseup: "+button+" x=" + x + " y="+ y);
 		dragmode = false;
+		uiIsdragging = false;
 	}
 	
 	static function onMouseMove (x:Float, y:Float):Void
