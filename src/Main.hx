@@ -1,10 +1,20 @@
 package;
 
-import peote.view.PeoteView;
-import peote.view.displaylist.DisplaylistType;
+import haxe.io.BytesInput;
+import haxe.io.BytesOutput;
+
+#if html5
+import js.Boot;
+import js.Browser;
+#end
+
 import haxe.Timer;
+import haxe.io.Bytes;
+import haxe.crypto.Base64;
+
 import haxe.ui.Toolkit;
 import haxe.ui.core.Screen;
+
 import openfl.Lib;
 import openfl.display.OpenGLView;
 import openfl.display.StageDisplayState;
@@ -15,21 +25,26 @@ import openfl.events.TouchEvent;
 import openfl.geom.Rectangle;
 import openfl.ui.Keyboard;
 
+import peote.view.PeoteView;
+import peote.view.displaylist.DisplaylistType;
+
+
 class Main {
 	static var view:OpenGLView;
-	static var width: Int;
-	static var height: Int;
-	static var mouse_x: Float = 0;
-	static var mouse_y: Float = 0;
-	static var dragstart_x: Float = 0;
-	static var dragstart_y: Float = 0;
-	static var dragmode: Bool = false;
-	public static var uiIsdragging: Bool = false;
-	static var zoom: Float = 1.0;
-	static var zoomstep: Float = 1.2;
+	static var width:Int;
+	static var height:Int;
+	static var mouse_x:Float = 0;
+	static var mouse_y:Float = 0;
+	static var dragstart_x:Float = 0;
+	static var dragstart_y:Float = 0;
+	public static var dragmode:Bool = false;
+	public static var uiIsdragging:Bool = false;
+	static var zoom:Float = 1.0;
+	static var zoomstep:Float = 1.2;
 
 	static var startTime:Float;
 	static var peoteView:PeoteView;
+	static var frame:Int = 0;
 
 	// shader uniform vars
 	static var position:Array<Float> = [0, 0];
@@ -43,24 +58,24 @@ class Main {
 	public static var colpos:Array<Float> = [1,0,0];
 	public static var colmid:Array<Float> = [0,0,0];
 	public static var colneg:Array<Float> = [0,0,1];
-
+	
+	static var ui:UI;
 
 	public static function main() {
 		initPeoteView();
 
 		Toolkit.init();
 
-		var ui:UI = new UI();
+		ui = new UI();
 		Screen.instance.addComponent(ui);
 		// stage events -----------------------------------------
 		Lib.current.stage.addEventListener( Event.RESIZE, function(e) { onWindowResize( Lib.current.stage.stageWidth, Lib.current.stage.stageHeight );  } );
-		Lib.current.stage.addEventListener( MouseEvent.MOUSE_MOVE, function(e:MouseEvent) { onMouseMove( e.stageX, e.stageY );  } );
-		Lib.current.stage.addEventListener( MouseEvent.MOUSE_DOWN, function(e:MouseEvent) { onMouseDown( e.stageX, e.stageY, 0 );  } );
-		Lib.current.stage.addEventListener( MouseEvent.MOUSE_UP,   function(e:MouseEvent) { onMouseUp( e.stageX, e.stageY, 0 );  } );
+
+		// mouse or touch events depends on "first click"
+		Lib.current.stage.addEventListener( MouseEvent.MOUSE_DOWN, firstMouseDownEvent );
+		Lib.current.stage.addEventListener( TouchEvent.TOUCH_BEGIN, firstTouchBeginEvent );
+		
 		Lib.current.stage.addEventListener( MouseEvent.MOUSE_WHEEL,function(e:MouseEvent) { onMouseWheel( e.delta, e.delta );  } );
-		/*Lib.current.stage.addEventListener( TouchEvent.TOUCH_BEGIN, onTouchBegin);
-		Lib.current.stage.addEventListener( TouchEvent.TOUCH_END,   onTouchEnd  );
-		Lib.current.stage.addEventListener( TouchEvent.TOUCH_MOVE,  onTouchMove );*/
 		Lib.current.stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown   );
 		
 		// stop dragging if mouse leaves app-window
@@ -68,10 +83,29 @@ class Main {
 			onMouseUp( e.stageX, e.stageY, 0 );
 			ui.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP));
 		});
-		
+			
+		getUrlParams();		
 	}
 
+	static function firstMouseDownEvent(e:MouseEvent):Void
+	{
+		Lib.current.stage.removeEventListener( TouchEvent.TOUCH_BEGIN, firstTouchBeginEvent);
+		Lib.current.stage.removeEventListener( MouseEvent.MOUSE_DOWN, firstMouseDownEvent);
+		Lib.current.stage.addEventListener( MouseEvent.MOUSE_DOWN, function(e:MouseEvent) { onMouseDown( e.stageX, e.stageY, 0 );  } );
+		Lib.current.stage.addEventListener( MouseEvent.MOUSE_MOVE, function(e:MouseEvent) { onMouseMove( e.stageX, e.stageY );  } );
+		Lib.current.stage.addEventListener( MouseEvent.MOUSE_UP,   function(e:MouseEvent) { onMouseUp( e.stageX, e.stageY, 0 );  } );
+		onMouseDown( e.stageX, e.stageY, 0 );
+	}	
 	
+	static function firstTouchBeginEvent(e:TouchEvent):Void
+	{
+		Lib.current.stage.removeEventListener( MouseEvent.MOUSE_DOWN, firstMouseDownEvent);
+		Lib.current.stage.removeEventListener( TouchEvent.TOUCH_BEGIN, firstTouchBeginEvent);
+		Lib.current.stage.addEventListener( TouchEvent.TOUCH_BEGIN, function(e:TouchEvent) { onMouseDown( e.stageX, e.stageY, 0 ); });
+		Lib.current.stage.addEventListener( TouchEvent.TOUCH_MOVE,  function(e:TouchEvent) { onMouseMove( e.stageX, e.stageY ); } );
+		Lib.current.stage.addEventListener( TouchEvent.TOUCH_END,   function(e:TouchEvent) { onMouseUp( e.stageX, e.stageY, 0 ); }  );
+		onMouseDown( e.stageX, e.stageY, 0 );
+	}	
 	
 	static function initPeoteView () {
 		if (OpenGLView.isSupported) {
@@ -127,14 +161,50 @@ class Main {
 			Lib.current.stage.addChild(view);
 		}
 	}
-	static var frame:Int = 0;
+	
 	// ----------- Render Loop ------------------------------------
 	static function renderView (rect:Rectangle):Void
 	{
 		peoteView.render(Timer.stamp() - startTime, Std.int (rect.width), Std.int (rect.height));
 	}
 
+	// URL handling
+	static public function updateUrlParams()
+	{
+		
+		var b:BytesOutput = ui.serializeParams();
+		b.writeFloat(position[0]);
+		b.writeFloat(position[1]);
+		b.writeFloat(zoom);
+		
+		var params:String = Base64.encode(b.getBytes(),false);
 
+		#if html5
+		Browser.window.history.replaceState('haxeshaderfun', 'haxeshaderfun', Browser.location.pathname + '?' + params);
+		#end
+	}
+	
+	static function getUrlParams()
+	{
+		#if html5	
+		var e:EReg = new EReg("\\?([" + Base64.CHARS + "]+)$", "");
+		if (e.match(Browser.document.URL)) {
+			var b:BytesInput = new BytesInput(Base64.decode( e.matched(1) , false));
+			//trace(b.length);
+			if (b.length == 33) {
+				ui.unSerializeParams(b);
+				position[0] = b.readFloat();
+				position[1] = b.readFloat();
+				zoom = b.readFloat();
+				scale[0] = scale[1] =  zoom * 400.0;
+			}
+			else ui.updateAll();
+		}
+		else ui.updateAll();
+		#else
+		ui.updateAll();
+		#end		
+	}
 	
 	// ------------------------------------------------------------
 	// ----------- EVENT HANDLER ----------------------------------
@@ -167,6 +237,7 @@ class Main {
 		//trace("onmouseup: "+button+" x=" + x + " y="+ y);
 		dragmode = false;
 		uiIsdragging = false;
+		updateUrlParams();
 	}
 	
 	static function onMouseMove (x:Float, y:Float):Void
@@ -199,7 +270,9 @@ class Main {
 			position[1] -= (mouse_y - position[1]) / zoomstep - (mouse_y - position[1]);
 			zoom /= zoomstep;
 		}
-		scale[0] = scale[1] =  zoom*400.0;
+		scale[0] = scale[1] =  zoom * 400.0;
+		
+		updateUrlParams();
 	}
 	
 	// Touch Events --------------------------------------------- TODO
@@ -229,7 +302,8 @@ class Main {
 			case Keyboard.F:
 				trace("SET FULLSCREEN");
 				#if html5				
-				var e:Dynamic = untyped __js__("document.getElementById('openfl-content').getElementsByTagName('canvas')[0]");
+				//var e:Dynamic = untyped __js__("document.getElementById('openfl-content').getElementsByTagName('canvas')[0]");
+				var e:Dynamic = Browser.document.getElementById('openfl-content').getElementsByTagName('canvas')[0];
 				var noFullscreen:Dynamic = untyped __js__("(!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement)");
 				
 				if ( noFullscreen)
@@ -241,7 +315,7 @@ class Main {
 				}
 				else
 				{	// leave fullscreen
-					var d:Dynamic = untyped __js__("document");
+					var d:Dynamic = Browser.document;
 					if (d.exitFullscreen) d.exitFullscreen();
 					else if (d.msExitFullscreen) d.msExitFullscreen();
 					else if (d.mozCancelFullScreen) d.mozCancelFullScreen();

@@ -26,7 +26,7 @@
 	<haxedef name="peote_vert_medium_precision" if="rpi||android" />
 	<haxedef name="peote_frag_medium_precision" if="rpi||android" />
 	<!--<haxedef name="debugshader" />-->
-	<!--<haxeflag name="-dce" value="full" />-->
+	<haxeflag name="-dce" value="full" />
 	
     <assets path="assets/css" rename="css" />
     <assets path="assets/fonts" rename="fonts" />

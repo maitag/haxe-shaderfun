@@ -54,42 +54,42 @@
 		
         <hbox>
             <label text="Pre Iteration:" styleNames="left" />
-            <hslider id="iteration0" min="0" max="2000" value="200" styleNames="middle" />
-            <label bindTo="iteration0" bindTransform="${MathUtils.round(value/100, 2)}" styleNames="right" />
+            <hslider id="iteration0" min="0" max="512" value="0" styleNames="middle" />
+            <label bindTo="iteration0" bindTransform="${MathUtils.round(value/256, 2)}" styleNames="right" />
         </hbox>    
         
         <hbox>
             <label text="Iteration:" styleNames="left" />
-            <hslider id="iteration1" min="100" max="20000" value="500" styleNames="middle" />
-            <label bindTo="iteration1" bindTransform="${MathUtils.round(value/100, 1)}" styleNames="right" />
+            <hslider id="iteration1" min="255" max="17920" value="1024" styleNames="middle" />
+            <label bindTo="iteration1" bindTransform="${MathUtils.round(value/255, 1)}" styleNames="right" />
         </hbox>    
         
         <hbox>
             <label text="Param 1:" styleNames="left" />
-            <hslider id="param0" min="1" max="500" value="250" styleNames="middle" />
-            <label bindTo="param0" bindTransform="${MathUtils.round(value/100, 2)}" styleNames="right" />
+            <hslider id="param0" min="0" max="768" value="637" styleNames="middle" />
+            <label bindTo="param0" bindTransform="${MathUtils.round(value/255, 2)}" styleNames="right" />
         </hbox>    
         
         <hbox>
             <label text="Param 2:" styleNames="left" />
-            <hslider id="param1" min="0" max="300" value="200" styleNames="middle" />
-            <label bindTo="param1" bindTransform="${MathUtils.round(value/100, 2)}" styleNames="right" />
+            <hslider id="param1" min="0" max="768" value="512" styleNames="middle" />
+            <label bindTo="param1" bindTransform="${MathUtils.round(value/255, 2)}" styleNames="right" />
         </hbox>    
         
         <hbox>
             <label text="Shift:" styleNames="left" />
-            <hslider id="start" min="0" max="500" value="0" styleNames="middle" />
-            <label bindTo="start" bindTransform="${MathUtils.round(value/100, 2)}" styleNames="right" />
+            <hslider id="start" min="0" max="1280" value="0" styleNames="middle" />
+            <label bindTo="start" bindTransform="${MathUtils.round(value/255, 2)}" styleNames="right" />
         </hbox>    
         
         <hbox>
             <label text="Balance:" styleNames="left" />
-            <hslider id="balance" min="0" max="300" value="200" styleNames="middle" />
-            <label bindTo="balance" bindTransform="${MathUtils.round(value/100, 2)}" styleNames="right" />
+            <hslider id="balance" min="0" max="1024" value="768" styleNames="middle" />
+            <label bindTo="balance" bindTransform="${MathUtils.round(value/255-1, 2)}" styleNames="right" />
         </hbox>    
         
         <hbox style="padding-top:8px; padding-bottom:12px; ">
-			<button id="random" onclick="generateRandom()" styleNames="random-button" text="Random Parameter" />
+			<button id="randomParam" onclick="generateRandom()" styleNames="random-button" text="Random Parameter" />
         </hbox>
 		
 		<!--<checkbox id="randomcolor" value="true" text="randomize colors" />-->
@@ -98,27 +98,27 @@
             <vbox width="33%">
                 <label text="Pos Color" styleNames="col-label" />
                 <hbox style="horizontal-align:center; padding-left:8px;">
-                    <vslider styleNames="red" id="r1" min="0" max="100" value="100" />
-                    <vslider styleNames="green" id="g1" min="0" max="100" value="0" />
-                    <vslider styleNames="blue" id="b1" min="0" max="100" value="0" />
+                    <vslider styleNames="red" id="r1" min="0" max="255" value="255" />
+                    <vslider styleNames="green" id="g1" min="0" max="255" value="0" />
+                    <vslider styleNames="blue" id="b1" min="0" max="255" value="0" />
                 </hbox>
             </vbox>
             
             <vbox width="34%">
                 <label text="Mid Color" styleNames="col-label" />
                 <hbox style="horizontal-align:center; padding-left:8px;">
-                    <vslider styleNames="red" id="r2" min="0" max="100" value="0" />
-                    <vslider styleNames="green" id="g2" min="0" max="100" value="0" />
-                    <vslider styleNames="blue" id="b2" min="0" max="100" value="0" />
+                    <vslider styleNames="red" id="r2" min="0" max="255" value="0" />
+                    <vslider styleNames="green" id="g2" min="0" max="255" value="0" />
+                    <vslider styleNames="blue" id="b2" min="0" max="255" value="0" />
                 </hbox>
             </vbox>
             
             <vbox width="33%">
                 <label text="Neg Color" styleNames="col-label" />
                 <hbox style="horizontal-align:center; padding-left:8px;">
-                    <vslider styleNames="red" id="r3" min="0" max="100" value="0" />
-                    <vslider styleNames="green" id="g3" min="0" max="100" value="0" />
-                    <vslider styleNames="blue" id="b3" min="0" max="100" value="100" />
+                    <vslider styleNames="red" id="r3" min="0" max="255" value="0" />
+                    <vslider styleNames="green" id="g3" min="0" max="255" value="0" />
+                    <vslider styleNames="blue" id="b3" min="0" max="255" value="255" />
                 </hbox>
             </vbox>
         </hbox>
