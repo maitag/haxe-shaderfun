@@ -1,6 +1,5 @@
 package;
 
-import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
 import haxe.ui.core.Component;
@@ -10,16 +9,14 @@ import haxe.ui.core.UIEvent;
 @:build(haxe.ui.macros.ComponentMacros.build("assets/ui/ui.xml"))
 class UI extends Component {
 	
-	var changed:Bool = false;
-	
     public function new() {
         super();
         
         registerEvent(MouseEvent.MOUSE_DOWN, function(e:MouseEvent) { Main.uiIsdragging = true; });
-        registerEvent(MouseEvent.MOUSE_UP , function(e:MouseEvent) {
-			Main.dragmode = Main.uiIsdragging = false;
-			updateChanges();
-		});
+        registerEvent(MouseEvent.MOUSE_UP  , function(e:MouseEvent) { Main.dragmode = Main.uiIsdragging = false; });
+		
+		for (i in [iteration0, iteration1, param0, param1, start, balance, r1, g1, b1, r2, g2, b2, r3, g3, b3])
+			i.registerEvent(MouseEvent.MOUSE_UP , updateChanges);		
 		
 		iteration0.userData = [Main.iteration,0];
 		iteration1.userData = [Main.iteration,1];
@@ -57,27 +54,21 @@ class UI extends Component {
 		randomColor.onClick = updateChanges;
     }
     
-    private function updateChanges(?e:UIEvent) {
-		if (e == null) {
-			if (changed) {
-				changed = false;
-				Main.updateUrlParams();
-			}
-		}
-		else {
-			changed = false;
+    private function updateChanges(e:UIEvent) {
+		if (Main.changed) {
+			Main.changed = false;
 			Main.updateUrlParams();
 		}
 	}
 	
     private function updateValue(e:UIEvent) {
 		e.target.userData[0][e.target.userData[1]] = e.target.value.toFloat() / 255;
-		changed = true;
+		Main.changed = true;
 	}
 	
     public function updateAll() {
 		for (i in [iteration0, iteration1, param0, param1, start, balance, r1, g1, b1, r2, g2, b2, r3, g3, b3])
-			i.userData[0][i.userData[1]] = i.value.toFloat() / 255;	
+			i.userData[0][i.userData[1]] = i.value.toFloat() / 255;
     }
 
 	public function serializeParams():BytesOutput

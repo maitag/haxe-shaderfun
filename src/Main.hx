@@ -39,9 +39,10 @@ class Main {
 	static var dragstart_y:Float = 0;
 	public static var dragmode:Bool = false;
 	public static var uiIsdragging:Bool = false;
+	public static var changed:Bool = false;
 	static var zoom:Float = 1.0;
 	static var zoomstep:Float = 1.2;
-
+	
 	static var startTime:Float;
 	static var peoteView:PeoteView;
 	static var frame:Int = 0;
@@ -61,7 +62,8 @@ class Main {
 	
 	static var ui:UI;
 
-	public static function main() {
+	public static function main()
+	{
 		initPeoteView();
 
 		Toolkit.init();
@@ -72,47 +74,42 @@ class Main {
 		Lib.current.stage.addEventListener( Event.RESIZE, function(e) { onWindowResize( Lib.current.stage.stageWidth, Lib.current.stage.stageHeight );  } );
 
 		// mouse or touch events depends on "first click"
-		Lib.current.stage.addEventListener( MouseEvent.MOUSE_DOWN, firstMouseDownEvent );
+		Lib.current.stage.addEventListener( MouseEvent.MOUSE_DOWN, onMouseDown);
+		Lib.current.stage.addEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+		Lib.current.stage.addEventListener( MouseEvent.MOUSE_UP,   onMouseUp );
+
 		Lib.current.stage.addEventListener( TouchEvent.TOUCH_BEGIN, firstTouchBeginEvent );
 		
-		Lib.current.stage.addEventListener( MouseEvent.MOUSE_WHEEL,function(e:MouseEvent) { onMouseWheel( e.delta, e.delta );  } );
+		Lib.current.stage.addEventListener( MouseEvent.MOUSE_WHEEL, onMouseWheel );
 		Lib.current.stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyDown   );
 		
 		// stop dragging if mouse leaves app-window
 		Lib.current.stage.addEventListener( Event.MOUSE_LEAVE, function(e:MouseEvent) {
-			onMouseUp( e.stageX, e.stageY, 0 );
+			stopDrag();
 			ui.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP));
 		});
-			
+
 		getUrlParams();		
 	}
 
-	static function firstMouseDownEvent(e:MouseEvent):Void
-	{
-		Lib.current.stage.removeEventListener( TouchEvent.TOUCH_BEGIN, firstTouchBeginEvent);
-		Lib.current.stage.removeEventListener( MouseEvent.MOUSE_DOWN, firstMouseDownEvent);
-		Lib.current.stage.addEventListener( MouseEvent.MOUSE_DOWN, function(e:MouseEvent) { onMouseDown( e.stageX, e.stageY, 0 );  } );
-		Lib.current.stage.addEventListener( MouseEvent.MOUSE_MOVE, function(e:MouseEvent) { onMouseMove( e.stageX, e.stageY );  } );
-		Lib.current.stage.addEventListener( MouseEvent.MOUSE_UP,   function(e:MouseEvent) { onMouseUp( e.stageX, e.stageY, 0 );  } );
-		onMouseDown( e.stageX, e.stageY, 0 );
-	}	
-	
 	static function firstTouchBeginEvent(e:TouchEvent):Void
 	{
-		Lib.current.stage.removeEventListener( MouseEvent.MOUSE_DOWN, firstMouseDownEvent);
 		Lib.current.stage.removeEventListener( TouchEvent.TOUCH_BEGIN, firstTouchBeginEvent);
-		Lib.current.stage.addEventListener( TouchEvent.TOUCH_BEGIN, function(e:TouchEvent) { onMouseDown( e.stageX, e.stageY, 0 ); });
-		Lib.current.stage.addEventListener( TouchEvent.TOUCH_MOVE,  function(e:TouchEvent) { onMouseMove( e.stageX, e.stageY ); } );
-		Lib.current.stage.addEventListener( TouchEvent.TOUCH_END,   function(e:TouchEvent) { onMouseUp( e.stageX, e.stageY, 0 ); }  );
-		onMouseDown( e.stageX, e.stageY, 0 );
+		Lib.current.stage.removeEventListener( MouseEvent.MOUSE_DOWN, onMouseDown);
+		Lib.current.stage.removeEventListener( MouseEvent.MOUSE_MOVE, onMouseMove );
+		Lib.current.stage.removeEventListener( MouseEvent.MOUSE_UP,   onMouseUp );
+
+		Lib.current.stage.addEventListener( TouchEvent.TOUCH_BEGIN, onTouchBegin );
+		Lib.current.stage.addEventListener( TouchEvent.TOUCH_MOVE,  onTouchMove );
+		Lib.current.stage.addEventListener( TouchEvent.TOUCH_END,   onTouchEnd );
+		
+		onTouchBegin(e);
 	}	
 	
-	static function initPeoteView () {
+	static function initPeoteView ()
+	{
 		if (OpenGLView.isSupported) {
 
-			trace("OpenGLView.isSupported");
-			
-			// start Sample
 			startTime = Timer.stamp();
 			var t:Float = Timer.stamp() - startTime;
 			
@@ -168,29 +165,25 @@ class Main {
 		peoteView.render(Timer.stamp() - startTime, Std.int (rect.width), Std.int (rect.height));
 	}
 
-	// URL handling
+	// ----------- URL handling ------------------------------------
 	static public function updateUrlParams()
-	{
-		
+	{		
+		#if html5
 		var b:BytesOutput = ui.serializeParams();
 		b.writeFloat(position[0]);
 		b.writeFloat(position[1]);
 		b.writeFloat(zoom);
-		
 		var params:String = Base64.encode(b.getBytes(),false);
-
-		#if html5
 		Browser.window.history.replaceState('haxeshaderfun', 'haxeshaderfun', Browser.location.pathname + '?' + params);
 		#end
 	}
 	
 	static function getUrlParams()
 	{
-		#if html5	
+		#if html5
 		var e:EReg = new EReg("\\?([" + Base64.CHARS + "]+)$", "");
 		if (e.match(Browser.document.URL)) {
 			var b:BytesInput = new BytesInput(Base64.decode( e.matched(1) , false));
-			//trace(b.length);
 			if (b.length == 33) {
 				ui.unSerializeParams(b);
 				position[0] = b.readFloat();
@@ -198,12 +191,9 @@ class Main {
 				zoom = b.readFloat();
 				scale[0] = scale[1] =  zoom * 400.0;
 			}
-			else ui.updateAll();
 		}
-		else ui.updateAll();
-		#else
-		ui.updateAll();
 		#end		
+		ui.updateAll();
 	}
 	
 	// ------------------------------------------------------------
@@ -220,42 +210,24 @@ class Main {
 	
 	// Mouse Events ---------------------------------------------
 
-	static function onMouseDown (x:Float, y:Float, button:Int):Void
+	static function onMouseDown (e:MouseEvent):Void
 	{	
-		//trace("onMouseDown: x=" + x + " y="+ y);
-		if ( button == 0)
-		{
-			dragstart_x = position[0] - x;
-			dragstart_y = position[1] - y;
-			dragmode = true;
-		}
-		//else if (button == 1) {}
+		if ( e.buttonDown ) startDrag(e.stageX, e.stageY);
 	}
 	
-	static function onMouseUp (x:Float, y:Float, button:Int):Void
+	static function onMouseUp (e:MouseEvent):Void
 	{	
-		//trace("onmouseup: "+button+" x=" + x + " y="+ y);
-		dragmode = false;
-		uiIsdragging = false;
-		updateUrlParams();
+		stopDrag();
 	}
 	
-	static function onMouseMove (x:Float, y:Float):Void
+	static function onMouseMove (e:MouseEvent):Void
 	{
-		//trace("onMouseMove: " + x + "," + y );
-		mouse_x = x;
-		mouse_y = y;		
-		if (dragmode && !uiIsdragging)
-		{
-			position[0] = (dragstart_x + mouse_x);
-			position[1] = (dragstart_y + mouse_y);
-		}
+		moveDrag(e.stageX, e.stageY);
 	}
 	
-	static function onMouseWheel (deltaX:Float, deltaY:Float):Void
+	static function onMouseWheel (e:MouseEvent):Void
 	{	
-		//trace("onmousewheel: " + deltaX + ',' + deltaY );
-		if ( deltaY > 0 )
+		if ( e.delta > 0 )
 		{
 			if (zoom < 10000)
 			{
@@ -270,29 +242,57 @@ class Main {
 			position[1] -= (mouse_y - position[1]) / zoomstep - (mouse_y - position[1]);
 			zoom /= zoomstep;
 		}
+		
 		scale[0] = scale[1] =  zoom * 400.0;
 		
 		updateUrlParams();
 	}
 	
-	// Touch Events --------------------------------------------- TODO
-	/*
+	// Touch Events ---------------------------------------------
 	static function onTouchBegin (e:TouchEvent):Void
 	{
-		trace("onTouchBegin: " + e );
-		//e.localX
-		//e.localY
-		//e.touchPointID
+		startDrag(e.stageX, e.stageY);
 	}
+	
+	static function onTouchMove (e:MouseEvent):Void
+	{
+		moveDrag(e.stageX, e.stageY);
+	}
+	
 	static function onTouchEnd (e:TouchEvent):Void
 	{
-		trace("onTouchEnd: " + e );
+		stopDrag();
 	}
-	static function onTouchMove (e:TouchEvent):Void
+	
+	// Dragging --------------------------------------------------
+	static inline function startDrag(x:Float, y:Float)
 	{
-		trace("onTouchMove: " + e );
+		dragstart_x = position[0] - x;
+		dragstart_y = position[1] - y;
+		dragmode = true;		
 	}
-	*/
+	
+	static inline function stopDrag()
+	{
+		dragmode = false;
+		uiIsdragging = false;
+		if (changed) {
+			changed = false;
+			updateUrlParams();
+		}
+	}
+	
+	static inline function moveDrag(x:Float, y:Float)
+	{
+		mouse_x = x;
+		mouse_y = y;		
+		if (dragmode && !uiIsdragging)
+		{
+			position[0] = (dragstart_x + mouse_x);
+			position[1] = (dragstart_y + mouse_y);
+			changed = true;
+		}
+	}
 	
 	// Keyboard Events -------------------------------------------
 	
@@ -300,9 +300,7 @@ class Main {
 	{
 		switch (k.keyCode) {
 			case Keyboard.F:
-				trace("SET FULLSCREEN");
 				#if html5				
-				//var e:Dynamic = untyped __js__("document.getElementById('openfl-content').getElementsByTagName('canvas')[0]");
 				var e:Dynamic = Browser.document.getElementById('openfl-content').getElementsByTagName('canvas')[0];
 				var noFullscreen:Dynamic = untyped __js__("(!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement)");
 				
@@ -330,7 +328,6 @@ class Main {
 			default:
 		}
 	}
-	// end Event Handler
 	// ------------------------------------------------------------
 
 }
