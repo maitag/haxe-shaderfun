@@ -43,7 +43,6 @@ class Main {
 	static var zoom:Float = 1.0;
 	static var zoomstep:Float = 1.2;
 	
-	static var startTime:Float;
 	static var peoteView:PeoteView;
 	static var frame:Int = 0;
 
@@ -110,9 +109,6 @@ class Main {
 	{
 		if (OpenGLView.isSupported) {
 
-			startTime = Timer.stamp();
-			var t:Float = Timer.stamp() - startTime;
-			
 			peoteView = new PeoteView({});
 
 			peoteView.setProgram( {
@@ -135,7 +131,7 @@ class Main {
 			peoteView.setDisplaylist( { 
 				displaylist:0,
 				type:DisplaylistType.SIMPLE,
-				maxElements:       1,
+				maxElements:1,
 				x:0,
 				y:0,
 			});
@@ -162,7 +158,7 @@ class Main {
 	// ----------- Render Loop ------------------------------------
 	static function renderView (rect:Rectangle):Void
 	{
-		peoteView.render(Timer.stamp() - startTime, Std.int (rect.width), Std.int (rect.height));
+		peoteView.render( Std.int(rect.width), Std.int(rect.height) );
 	}
 
 	// ----------- URL handling ------------------------------------
