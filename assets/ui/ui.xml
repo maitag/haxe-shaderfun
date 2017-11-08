@@ -53,6 +53,12 @@
 		</hbox>
 		
         <hbox>
+            <!--<label text="Formula:" styleNames="left" />-->
+            <textfield id="formula" text="a*sin(x+y)*sin(x+y)+b" styleNames="formula" />
+            <button id="changeFormula" styleNames="" text="GO" />
+        </hbox>    
+        
+        <hbox>
             <label text="Pre Iteration:" styleNames="left" />
             <hslider id="iteration0" min="0" max="512" value="0" styleNames="middle" />
             <label bindTo="iteration0" bindTransform="${MathUtils.round(value/256, 2)}" styleNames="right" />
@@ -65,13 +71,13 @@
         </hbox>    
         
         <hbox>
-            <label text="Param 1:" styleNames="left" />
+            <label text="Param a:" styleNames="left" />
             <hslider id="param0" min="0" max="768" value="637" styleNames="middle" />
             <label bindTo="param0" bindTransform="${MathUtils.round(value/255, 2)}" styleNames="right" />
         </hbox>    
         
         <hbox>
-            <label text="Param 2:" styleNames="left" />
+            <label text="Param b:" styleNames="left" />
             <hslider id="param1" min="0" max="768" value="512" styleNames="middle" />
             <label bindTo="param1" bindTransform="${MathUtils.round(value/255, 2)}" styleNames="right" />
         </hbox>    

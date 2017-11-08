@@ -19,14 +19,16 @@ uniform vec3 uColneg;
 uniform vec3 uColmid;
 uniform int uColtype;
 
-float func(float x, float p, float p1, float p2)
+float func(float x, float y, float a, float b)
 {
-    return p1*sin(x+p)*sin(x+p)+p2;
+    //return a*sin(x+y)*sin(x+y)+b;
+    return #FORMULA;
 }
 
-float deriv(float x, float p, float p1, float p2)
+float deriv(float x, float y, float a, float b)
 {
-    return p1*sin(2.0*(x+p));
+    //return a*sin(2.0*(x+y));
+    return #DERIVATE;
 }
 
 void pre_step(inout float x, vec2 p, float p1, float p2)

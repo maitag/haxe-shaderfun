@@ -34,6 +34,11 @@
 }
 
 
+/* --- textfield for formula --- */
+.formula {
+	width: 100%;
+}
+
 /* --- columns for upper parameters --- */
 
 .left {

@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-    <meta title="haxeshaderfun" package="haxe.shaderfun" version="0.6.7" company="Sylvio Sell" />
-    <app main="Main" file="haxeshaderfun" path="bin" />
+	<meta title="haxeshaderfun" package="haxe.shaderfun" version="0.6.8" company="Sylvio Sell" />
+	<app main="Main" file="haxeshaderfun" path="bin" />
 
-    <!--<window background="#FFFFFF" fps="60" />
-    <window width="800" height="600" unless="mobile" />-->
-    
+	<!--<window background="#FFFFFF" fps="60" />
+	<window width="800" height="600" unless="mobile" />-->
+
 	<!-- classpath, haxe libs -->
-    <source path="src" />
+	<source path="src" />
 	
-    <haxelib name="actuate" />
-    <haxelib name="hscript" />
+	<haxelib name="actuate" />
+	<haxelib name="hscript" />
 	
 
 	<haxelib name="peote-view" /><!-- install via: haxelib git peote-view https://github.com/maitag/peote-view  -->
-
+	<haxelib name="formula" /><!-- install via: haxelib git peote-view https://github.com/maitag/formula  -->
+	
 	<haxelib name="openfl" />
 
-
-    <haxelib name="haxeui-core" />
-    <haxelib name="haxeui-openfl" />
+	<haxelib name="haxeui-core" />
+	<haxelib name="haxeui-openfl" />
 
 
 	<!-- shader float precision for html5 and raspberry pi and android -->
 	<haxedef name="peote_vert_medium_precision" if="rpi||android" />
-	<haxedef name="peote_frag_medium_precision" if="rpi||android" />
+	<haxedef name="peote_frag_medium_precision" if="rpi" />
 	<!--<haxedef name="debugshader" />-->
 	<haxeflag name="-dce" value="full" />
 	

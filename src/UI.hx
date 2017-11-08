@@ -34,6 +34,9 @@ class UI extends Component {
 		g3.userData = [Main.colneg,1];
 		b3.userData = [Main.colneg,2];
 		
+		// TODO
+		changeFormula.onClick = function(e:UIEvent) { Main.updateFormula(formula.text); };
+		
         iteration0.onChange = updateValue;
         iteration1.onChange = updateValue;
         param0.onChange = updateValue;

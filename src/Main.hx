@@ -25,9 +25,12 @@ import openfl.events.TouchEvent;
 import openfl.geom.Rectangle;
 import openfl.ui.Keyboard;
 
+import lime.Assets;
+
 import peote.view.PeoteView;
 import peote.view.displaylist.DisplaylistType;
 
+import Formula;
 
 class Main {
 	static var view:OpenGLView;
@@ -60,6 +63,10 @@ class Main {
 	public static var colneg:Array<Float> = [0,0,1];
 	
 	static var ui:UI;
+	
+	static var lyapunovShader:String;
+	static var formula:String;
+	static var formulaBytes:Bytes;
 
 	public static function main()
 	{
@@ -109,11 +116,13 @@ class Main {
 	{
 		if (OpenGLView.isSupported) {
 
-			peoteView = new PeoteView({});
+			peoteView = new PeoteView({maxPrograms:10});
 
+			lyapunovShader = loadShader("shader/lyapunov.frag");
+			
 			peoteView.setProgram( {
 				program:0,
-				fshader: "shader/lyapunov.frag",
+				fshaderSrc: parseShader(lyapunovShader,"a*sin(x+y)*sin(x+y)+b","a*sin(2.0*(x+y))"),
 				vars: [
 					"uPosition" => position,
 					"uScale" => scale,
@@ -160,6 +169,86 @@ class Main {
 	{
 		peoteView.render( Std.int(rect.width), Std.int(rect.height) );
 	}
+	
+	// ----------- update shader formula ------------------------------------
+	static public function updateFormula (_formula:String):Void
+	{
+		if (_formula != null && _formula != '' && _formula != formula && _formula.length < 255)
+		{
+			try {
+				var f:Formula = new Formula(_formula);
+				//trace("formula:" + f.toString());
+				var p:Array<String> = f.params();
+				if ((p.indexOf("x") >-1) && (p.indexOf("y") >-1) ) {
+					var wrongParams:Bool = false;
+					for (i in p) if (!(i == "x" || i == "y" || i == "a" || i == "b")) wrongParams = true;
+					if (!wrongParams) {
+						formula = _formula;
+						updateShader(f);
+						formulaBytes = f.toBytes();
+						updateUrlParams();
+						ui.formula.backgroundColor = 0xeeeeee;
+					}
+					else {
+						trace('Error: wrong params, only a and b are supported by param-sliders');
+						ui.formula.backgroundColor = 0xffddcc;
+					}
+				} else {
+					trace('Error: wrong params, need at least x and y');
+					ui.formula.backgroundColor = 0xffddcc;
+				}
+			}
+			catch (msg:String)
+			{
+				trace('Error: $msg');
+				ui.formula.backgroundColor = 0xffddcc;
+			}
+		}
+	}
+	
+	static public function updateShader (f:Formula):Void
+	{
+		//var glsl_formula :String = f.simplify().toString('glsl');
+		//var glsl_derivate:String = f.derivate("x").simplify().toString('glsl');
+		var glsl_formula :String = f.toString('glsl');
+		var glsl_derivate:String = f.derivate("x").toString('glsl');
+		//trace("formula:" + glsl_formula);
+		//trace("derivate:" + glsl_derivate);
+		peoteView.setProgram( {
+			program:0,
+			fshaderSrc: parseShader(lyapunovShader, glsl_formula, glsl_derivate),
+		});
+
+	}
+	
+	public static var rFORMULA: EReg = new EReg("#FORMULA","g");
+	public static var rDERIVATE:EReg = new EReg("#DERIVATE","g");
+	static public function parseShader(shadersrc:String, formula:String, derivate:String):String
+	{
+		return rFORMULA.replace(rDERIVATE.replace(shadersrc, derivate), formula);
+	}
+	
+	static public function loadShader(url:String):String
+	{
+		var shadersrc:String = '';
+		#if html5
+		var req = js.Browser.createXMLHttpRequest();
+		req.open('GET', url, false);
+		req.send();
+		shadersrc = req.responseText;
+		/*
+		Assets.loadText(url).onComplete (function (s) {
+			shadersrc = s; trace(s);
+		});*/
+		// need synced:
+		//shadersrc = Assets.loadText(url).result();
+		#else
+		shadersrc = Assets.getText(url);
+		//shadersrc = Assets.loadText(url).result();
+		//shadersrc = sys.io.File.getBytes(url).toString();
+		#end
+		return(shadersrc);
+	}
 
 	// ----------- URL handling ------------------------------------
 	static public function updateUrlParams()
@@ -169,6 +258,7 @@ class Main {
 		b.writeFloat(position[0]);
 		b.writeFloat(position[1]);
 		b.writeFloat(zoom);
+		b.writeBytes(formulaBytes, 0, formulaBytes.length);
 		var params:String = Base64.encode(b.getBytes(),false);
 		Browser.window.history.replaceState('haxeshaderfun', 'haxeshaderfun', Browser.location.pathname + '?' + params);
 		#end
@@ -179,13 +269,28 @@ class Main {
 		#if html5
 		var e:EReg = new EReg("\\?([" + Base64.CHARS + "]+)$", "");
 		if (e.match(Browser.document.URL)) {
-			var b:BytesInput = new BytesInput(Base64.decode( e.matched(1) , false));
-			if (b.length == 33) {
+			var bytes:Bytes = Base64.decode( e.matched(1) , false);
+			var b:BytesInput = new BytesInput(bytes);
+			//trace("position:"+b.position);
+			if (b.length >= 33) {
 				ui.unSerializeParams(b);
 				position[0] = b.readFloat();
 				position[1] = b.readFloat();
 				zoom = b.readFloat();
 				scale[0] = scale[1] =  zoom * 400.0;
+				//read rest into formula
+				if (b.length > 33) {
+					var o = new BytesOutput();
+					o.writeBytes(bytes, b.position, (b.length - 33));
+					//trace("o:", o);
+					formulaBytes = o.getBytes();
+					try {
+						updateFormula(Formula.fromBytes(formulaBytes));
+						ui.formula.text = formula;
+					} catch (msg:String) {
+						trace("ERROR: can not parse formula from url-parameters");
+					}
+				}
 			}
 		}
 		#end		

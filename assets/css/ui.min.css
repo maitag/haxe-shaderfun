@@ -1,0 +1,20 @@
+.label{color:#000000;vertical-align:center;}
+.hbox{width:100%;padding:0;}
+.vbox{padding:0;}
+#main{background-color:#707070;padding:10px;padding-left:14px;padding-bottom:14px;border:1px solid #222222;}
+.header{font-size:18px;color:#D0D0D0;vertical-align:center;}
+.header-small{font-size:11px;color:#C0C0C0;padding-bottom:10px;}
+.formula{width:100%;}
+.left{width:28%;}
+.middle{width:58%;}
+.right{width:14%;}
+.random-button{width:100%;}
+.col-label{horizontal-align:center;}
+.red .slider-value{background-color:#702211;background-color-end:#602211;}
+.green .slider-value{background-color:#1a661a;background-color-end:#1a551a;}
+.blue .slider-value{background-color:#223388;background-color-end:#223377;}
+.button{color:#C0C0C2;font-size:15px;}
+.hslider .slider-value-background{height:8px;}
+.vslider .slider-value-background{width:8px;}
+.hslider .slider-value{background-color:#AAAAAA;background-color-end:#888888;}
+
